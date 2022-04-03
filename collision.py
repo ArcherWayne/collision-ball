@@ -1,4 +1,5 @@
 import pygame, sys, time
+from debug import debug
 
 
 class StaticObstacle(pygame.sprite.Sprite):
@@ -18,6 +19,8 @@ class MovingVerticalObstacle(StaticObstacle):
         self.direction = pygame.math.Vector2((0, 1))
         self.speed = 450
         self.old_rect = self.rect.copy()
+
+    def display_
 
     def update(self, dt):
         self.old_rect = self.rect.copy()  # previous frame
