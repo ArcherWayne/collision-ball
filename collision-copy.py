@@ -21,10 +21,10 @@ class MovingVerticalObstacle(StaticObstacle):
         self.old_rect = self.rect.copy()
 
     def update(self, dt):
-        self.old_rect = self.rect.copy()  # previous frame
+        self.old_rect = self.rect.copy()    # previous frame
         if self.rect.bottom > 600:
             self.rect.bottom = 600
-            self.pos.y = self.rect.y
+            self.pos.y = self.rect.y  # pos是独立表示位置的一个变量, 先更新pos, 再根据pos更新rect
             self.direction.y *= -1
         if self.rect.bottom < 120:
             self.rect.bottom = 120
@@ -32,7 +32,7 @@ class MovingVerticalObstacle(StaticObstacle):
             self.direction.y *= -1
 
         self.pos.y += self.direction.y * self.speed * dt
-        self.rect.y = round(self.pos.y)  # current frame
+        self.rect.y = round(self.pos.y)     # current frame
 
 
 class MovingHorizontalObstacle(StaticObstacle):
@@ -48,7 +48,7 @@ class MovingHorizontalObstacle(StaticObstacle):
         self.old_rect = self.rect.copy()
         if self.rect.right > 1000:
             self.rect.right = 1000
-            self.pos.x = self.rect.x
+            self.pos.x = self.rect.x    # pos是独立表示位置的一个变量, 先更新pos, 再根据pos更新rect
             self.direction.x *= -1
         if self.rect.left < 600:
             self.rect.left = 600
@@ -79,7 +79,6 @@ class Player(pygame.sprite.Sprite):
 
     def input(self):
         keys = pygame.key.get_pressed()
-
         # movement input
         if keys[pygame.K_UP]:
             self.direction.y = -1
@@ -103,24 +102,12 @@ class Player(pygame.sprite.Sprite):
                     # collision on the right
                     if self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
                         self.rect.right = sprite.rect.left
-                        self.pos.x = self.rect.x
+                        self.pos.x = self.rect.x # rect和pos是相互更新的
 
                     # collision on the left
-                    if self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
-                        self.rect.left = sprite.rect.right
-                        self.pos.x = self.rect.x
 
             if direction == 'vertical':
-                for sprite in collision_sprites:
-                    # collision on the bottom
-                    if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
-                        self.rect.bottom = sprite.rect.top
-                        self.pos.y = self.rect.y
-
-                    # collision on the top
-                    if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
-                        self.rect.top = sprite.rect.bottom
-                        self.pos.y = self.rect.y
+                pass
 
     def update(self, dt):
         self.old_rect = self.rect.copy()
@@ -131,15 +118,14 @@ class Player(pygame.sprite.Sprite):
 
         self.pos.x += self.direction.x * self.speed * dt
         self.rect.x = round(self.pos.x)
-        self.collision('horizontal')
+        self.collision('horizontal') # check for horizontal collision
         self.pos.y += self.direction.y * self.speed * dt
         self.rect.y = round(self.pos.y)
-        self.collision('vertical')
 
 
 class Ball(pygame.sprite.Sprite):
-    def __init__(self, groups, obstacles, player):
-        super().__init__(groups)
+    def __init__(self, groups):
+        super(Ball, self).__init__(groups)
         self.image = pygame.Surface((40, 40))
         self.image.fill('red')
         self.rect = self.image.get_rect(center=(640, 360))
@@ -148,80 +134,6 @@ class Ball(pygame.sprite.Sprite):
         self.direction = pygame.math.Vector2(1, 1)
         self.speed = 400
         self.old_rect = self.rect.copy()
-
-        self.obstacles = obstacles
-        self.player = player
-
-    def collision(self, direction):
-        collision_sprites = pygame.sprite.spritecollide(self, self.obstacles, False)
-
-        if self.rect.colliderect(self.player.rect):
-            collision_sprites.append(self.player)
-
-        if collision_sprites:
-            if direction == 'horizontal':
-                for sprite in collision_sprites:
-                    # collision on the right
-                    if self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
-                        self.rect.right = sprite.rect.left
-                        self.pos.x = self.rect.x
-                        self.direction.x *= -1
-
-                    # collision on the left
-                    if self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
-                        self.rect.left = sprite.rect.right
-                        self.pos.x = self.rect.x
-                        self.direction.x *= -1
-
-            if direction == 'vertical':
-                for sprite in collision_sprites:
-                    # collision on the bottom
-                    if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
-                        self.rect.bottom = sprite.rect.top
-                        self.pos.y = self.rect.y
-                        self.direction.y *= -1
-
-                    # collision on the top
-                    if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
-                        self.rect.top = sprite.rect.bottom
-                        self.pos.y = self.rect.y
-                        self.direction.y *= -1
-
-    def window_collision(self, direction):
-        if direction == 'horizontal':
-            if self.rect.left < 0:
-                self.rect.left = 0
-                self.pos.x = self.rect.x
-                self.direction.x *= -1
-            if self.rect.right > 1280:
-                self.rect.right = 1280
-                self.pos.x = self.rect.x
-                self.direction.x *= -1
-
-        if direction == 'vertical':
-            if self.rect.top < 0:
-                self.rect.top = 0
-                self.pos.y = self.rect.y
-                self.direction.y *= -1
-            if self.rect.bottom > 720:
-                self.rect.bottom = 720
-                self.pos.y = self.rect.y
-                self.direction.y *= -1
-
-    def update(self, dt):
-        self.old_rect = self.rect.copy()
-
-        if self.direction.magnitude() != 0:
-            self.direction = self.direction.normalize()
-
-        self.pos.x += self.direction.x * self.speed * dt
-        self.rect.x = round(self.pos.x)
-        self.collision('horizontal')
-        self.window_collision('horizontal')
-        self.pos.y += self.direction.y * self.speed * dt
-        self.rect.y = round(self.pos.y)
-        self.collision('vertical')
-        self.window_collision('vertical')
 
 
 # general setup
@@ -238,8 +150,8 @@ StaticObstacle((800, 600), (100, 200), [all_sprites, collision_sprites])
 StaticObstacle((900, 200), (200, 10), [all_sprites, collision_sprites])
 MovingVerticalObstacle((200, 300), (200, 60), [all_sprites, collision_sprites])
 MovingHorizontalObstacle((850, 350), (100, 100), [all_sprites, collision_sprites])
-player = Player(all_sprites, collision_sprites)
-Ball(all_sprites, collision_sprites, player)
+Player(all_sprites, collision_sprites)
+Ball(all_sprites)
 
 # loop
 last_time = time.time()
@@ -255,7 +167,7 @@ while True:
             pygame.quit()
             sys.exit()
 
-    # drawing and updating the screen
+    # drawing and upadte the screen
     screen.fill('black')
     all_sprites.update(dt)
     all_sprites.draw(screen)
