@@ -131,15 +131,15 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = 720
             self.pos.y = self.rect.y
 
-        elif self.rect.top <= 0:
+        if self.rect.top <= 0:
             self.rect.top = 0
             self.pos.y = self.rect.y
 
-        elif self.rect.left <= 0:
+        if self.rect.left <= 0:
             self.rect.left = 0
             self.pos.x = self.rect.x
 
-        elif self.rect.right >= 1280:
+        if self.rect.right >= 1280:
             self.rect.right = 1280
             self.pos.x = self.rect.x
 

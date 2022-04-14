@@ -10,4 +10,4 @@
 # collision balls to do list
 1. 这个需要delta time
 2. 用drawio画个概念图
-3. groups?
+3. 研究下group的概念
