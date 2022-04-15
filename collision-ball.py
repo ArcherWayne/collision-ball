@@ -4,16 +4,16 @@ from debug import debug
 window_size = (600, 720)
 player_size = (80, 10)
 ball_size = (30, 30)
-blocks_size = (30, 80)
+blocks_size = (90, 30)
 
 
 class Blocks(pygame.sprite.Sprite):
     def __init__(self, pos, color, groups):
-        super(Blocks, self).__init__()
+        super(Blocks, self).__init__(groups)
         self.pos = pos
         self.image = pygame.Surface(blocks_size)
         self.image.fill(color)
-        self.rect = self.image.get_rect(center=pos)
+        self.rect = self.image.get_rect(topleft=pos)
         self.old_rect = self.rect.copy()
 
 
@@ -83,8 +83,8 @@ class Ball(pygame.sprite.Sprite):
         self.player = player
 
     def collision(self, direction):
-        # collision_sprites = pygame.sprite.spritecollide(self, self.blocks, True)
-        collision_sprites = []
+        collision_sprites = pygame.sprite.spritecollide(self, self.blocks, True)
+        # collision_sprites = []
 
         if self.rect.colliderect(self.player.rect):
             collision_sprites.append(self.player)
@@ -161,7 +161,11 @@ class Ball(pygame.sprite.Sprite):
 
 
 def generate_blocks():
-    pass
+    for x in range(6):
+        for y in range(8):
+            Blocks((x*100+5, y*40+5), ('yellow'), [all_sprites, collision_sprites])
+
+
 
 
 # general setup
@@ -171,8 +175,9 @@ screen = pygame.display.set_mode(window_size)
 # group setup
 all_sprites = pygame.sprite.Group()
 collision_sprites = pygame.sprite.Group()
+generate_blocks()
 player = Player(all_sprites)
-ball = Ball(all_sprites, 'blocks', player)
+ball = Ball(all_sprites, collision_sprites, player)
 
 last_time = time.time()
 
