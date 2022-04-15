@@ -8,6 +8,12 @@
 
 
 # collision balls to do list
-1. 这个需要delta time
-2. 用drawio画个概念图
-3. 研究下group的概念
+1. 这个需要delta time(完成)
+2. 用drawio画个概念图(完成)
+3. 研究下group的概念(完成)
+
+# Version 2
+1. 添加游戏结束功能: game_active = False
+2. 添加发射子弹功能
+3. 添加分数功能
+4. 添加音效

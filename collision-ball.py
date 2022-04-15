@@ -1,4 +1,4 @@
-import pygame, sys, time
+import pygame, sys, time, random
 from debug import debug
 
 window_size = (600, 720)
@@ -77,7 +77,7 @@ class Ball(pygame.sprite.Sprite):
         self.old_rect = self.rect.copy()
 
         self.pos = pygame.math.Vector2(self.rect.topleft)
-        self.direction = pygame.math.Vector2(1, 1)
+        self.direction = pygame.math.Vector2((1-(-1)) * random.random() + (-1), -1)
         self.speed = 260
         self.blocks = blocks
         self.player = player
@@ -161,9 +161,10 @@ class Ball(pygame.sprite.Sprite):
 
 
 def generate_blocks():
+    color = ['#665a02', '#807103', '#968503', '#ab9705', '#bfa904', '#e0c602', '#f0d302', '#ffe000']
     for x in range(6):
         for y in range(8):
-            Blocks((x*100+5, y*40+5), ('yellow'), [all_sprites, collision_sprites])
+            Blocks((x*100+5, y*40+5), (color[y]), [all_sprites, collision_sprites])
 
 
 
@@ -179,26 +180,32 @@ generate_blocks()
 player = Player(all_sprites)
 ball = Ball(all_sprites, collision_sprites, player)
 
-last_time = time.time()
 
-while True:
 
-    # delta time
-    dt = time.time() - last_time
+def main():
     last_time = time.time()
+    game_active = True
+    while True:
 
-    # event loop
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE):
-            pygame.quit()
-            sys.exit()
+        # delta time
+        dt = time.time() - last_time
+        last_time = time.time()
 
-    screen.fill('#123456')
-    all_sprites.update(dt)
-    all_sprites.draw(screen)
-    # player.draw(screen)  # 这里要draw和update实例
-    # player.update(dt)
-    # ball.draw(screen)
-    # ball.update(dt)
+        # event loop
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE):
+                pygame.quit()
+                sys.exit()
 
-    pygame.display.update()
+        screen.fill('#123456')
+        all_sprites.update(dt)
+        all_sprites.draw(screen)
+        # player.draw(screen)  # 这里要draw和update实例
+        # player.update(dt)
+        # ball.draw(screen)
+        # ball.update(dt)
+
+        pygame.display.update()
+
+if __name__ == "__main__":
+    main()
