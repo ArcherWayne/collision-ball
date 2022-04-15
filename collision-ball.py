@@ -18,7 +18,7 @@ class Blocks(pygame.sprite.Sprite):
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, groups, ball):
+    def __init__(self, groups):
         super(Player, self).__init__(groups)
 
         # image
@@ -44,8 +44,8 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
-    def collision(self):
-        pass
+    # def collision(self):
+    #     pass
 
     def boundary(self):
         if self.rect.left < 10:
@@ -83,10 +83,45 @@ class Ball(pygame.sprite.Sprite):
         self.player = player
 
     def collision(self, direction):
-        collision_sprites = pygame.sprite.spritecollide(self, self.blocks, True)
+        # collision_sprites = pygame.sprite.spritecollide(self, self.blocks, True)
+        collision_sprites = []
 
         if self.rect.colliderect(self.player.rect):
             collision_sprites.append(self.player)
+
+        if collision_sprites:
+            if direction == 'horizontal':
+                for sprite in collision_sprites:
+                    # collision on the right
+                    if self.rect.right >= sprite.rect.left \
+                            and self.old_rect.right <= sprite.old_rect.left:
+                        self.rect.right = sprite.rect.left
+                        self.pos.x = self.rect.x  # rect和pos是相互更新的
+                        self.direction.x *= -1
+
+                    # collision on the left
+                    if self.rect.left <= sprite.rect.right \
+                            and self.old_rect.left >= sprite.old_rect.right:
+                        self.rect.left = sprite.rect.right
+                        self.pos.x = self.rect.x  # rect和pos是相互更新的
+                        self.direction.x *= -1
+
+            if direction == 'vertical':
+                for sprite in collision_sprites:
+                    # collsion on the top
+                    if self.rect.top <= sprite.rect.bottom \
+                            and self.old_rect.top >= sprite.old_rect.bottom:
+                        self.rect.top = sprite.rect.bottom
+                        self.pos.y = self.rect.y  # 这里是更新自己的位置
+                        self.direction.y *= -1
+
+                    # collision on the bottom
+                    if self.rect.bottom >= sprite.rect.top \
+                            and self.old_rect.bottom <= sprite.old_rect.top:
+                        self.rect.bottom = sprite.rect.top
+                        self.pos.y = self.rect.y
+                        self.direction.y *= -1
+
 
     def window_collision(self, direction):
         if direction == 'horizontal':
@@ -116,10 +151,10 @@ class Ball(pygame.sprite.Sprite):
 
         self.pos.x += self.direction.x * self.speed * dt
         self.rect.x = round(self.pos.x)
-        # self.collision('horizontal')
+        self.collision('horizontal')
         self.pos.y += self.direction.y * self.speed * dt
         self.rect.y = round(self.pos.y)
-        # self.collision('vertical')
+        self.collision('vertical')
 
         self.window_collision('horizontal')
         self.window_collision('vertical')
@@ -136,11 +171,8 @@ screen = pygame.display.set_mode(window_size)
 # group setup
 all_sprites = pygame.sprite.Group()
 collision_sprites = pygame.sprite.Group()
-
-player = pygame.sprite.GroupSingle()
-ball = pygame.sprite.GroupSingle()
-player.add(Player(all_sprites, ball))  # 实例化
-ball.add(Ball(all_sprites, collision_sprites, player))
+player = Player(all_sprites)
+ball = Ball(all_sprites, 'blocks', player)
 
 last_time = time.time()
 
@@ -157,9 +189,11 @@ while True:
             sys.exit()
 
     screen.fill('#123456')
-    player.draw(screen)  # 这里要draw和update实例
-    player.update(dt)
-    ball.draw(screen)
-    ball.update(dt)
+    all_sprites.update(dt)
+    all_sprites.draw(screen)
+    # player.draw(screen)  # 这里要draw和update实例
+    # player.update(dt)
+    # ball.draw(screen)
+    # ball.update(dt)
 
     pygame.display.update()
