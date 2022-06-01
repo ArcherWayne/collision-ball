@@ -3,8 +3,9 @@ from debug import debug
 
 
 class StaticObstacle(pygame.sprite.Sprite):
-    def __init__(self, pos, size, groups):
-        super().__init__(groups)
+    def __init__(self, pos, size, groups): # 这里的pos和size是为了在创建实例时获得位置和大小
+        super().__init__(groups) # 继承sprite父类方法, groups表示选择这个类的实例创建时属于那个group
+        # 上一句话就相当于 伪码: self.groups = groups
         self.image = pygame.Surface(size)
         self.image.fill('yellow')
         self.rect = self.image.get_rect(topleft=pos)
@@ -13,9 +14,9 @@ class StaticObstacle(pygame.sprite.Sprite):
 
 class MovingVerticalObstacle(StaticObstacle):
     def __init__(self, pos, size, groups):
-        super().__init__(pos, size, groups)
+        super().__init__(pos, size, groups) # 这句话中的pos是用来创建实例时获得位置的
         self.image.fill('green')
-        self.pos = pygame.math.Vector2(self.rect.topleft)
+        self.pos = pygame.math.Vector2(self.rect.topleft) # 这个pos应该是覆盖掉了上面那个pos, 用来表示实时位置的向量
         self.direction = pygame.math.Vector2((0, 1))
         self.speed = 450
         self.old_rect = self.rect.copy()
@@ -150,7 +151,7 @@ class Ball(pygame.sprite.Sprite):
         self.old_rect = self.rect.copy()
 
         self.obstacles = obstacles
-        self.player = player
+        self.player = player # 这里传入的是一个实例, 因为ball的实例是和player的实例相互动的
 
     def collision(self, direction):
         collision_sprites = pygame.sprite.spritecollide(self, self.obstacles, False)
@@ -259,6 +260,7 @@ while True:
     screen.fill('black')
     all_sprites.update(dt)
     all_sprites.draw(screen)
+
 
     # display output
     pygame.display.update()
