@@ -11,7 +11,6 @@ class StaticObstacle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=pos)
         self.old_rect = self.rect.copy()
 
-
 class MovingVerticalObstacle(StaticObstacle):
     def __init__(self, pos, size, groups):
         super().__init__(pos, size, groups) # 这句话中的pos是用来创建实例时获得位置的
@@ -35,7 +34,6 @@ class MovingVerticalObstacle(StaticObstacle):
         self.pos.y += self.direction.y * self.speed * dt
         self.rect.y = round(self.pos.y)  # current frame
 
-
 class MovingHorizontalObstacle(StaticObstacle):
     def __init__(self, pos, size, groups):
         super().__init__(pos, size, groups)
@@ -58,7 +56,6 @@ class MovingHorizontalObstacle(StaticObstacle):
 
         self.pos.x += self.direction.x * self.speed * dt
         self.rect.x = round(self.pos.x)
-
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, groups, obstacles):
